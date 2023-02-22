@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import fetchMe from "./api/fetchMe";
+import { useEffect } from "react";
+import { useQuery, useQueryClient } from "react-query";
+import fetchMe from "./api-helper/fetchMe";
 
 export default function useUser({
   redirectIfUnauthenticated,
@@ -14,19 +15,23 @@ export default function useUser({
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  if (!query.isLoading) {
-    if (!query.data && redirectIfUnauthenticated)
-      router.push(`/auth/login?redirect=${encodeURIComponent(router.asPath)}`);
-    if (query.data && redirectIfAuthenticated)
-      router.push('/');
-  }
+  useEffect(() => {
+    if (!query.isLoading) {
+      if (!query.isSuccess && redirectIfUnauthenticated)
+        router.push(`/auth/login?redirect=${encodeURIComponent(router.asPath)}`);
+      if (query.isSuccess && redirectIfAuthenticated)
+        router.push('/');
+    }
+  }, [query.isLoading, query.data, redirectIfUnauthenticated, redirectIfAuthenticated]);
+
 
   return {
     user: query.data,
     isLoading: query.isLoading,
     error: query.error,
-    isLoggedIn: !!query.data,
-    isAuthed: query.data && !query.isLoading,
+    isError: query.isError,
+    isFetching: query.isFetching,
+    isAuthed: query.isSuccess && !query.isLoading,
     invalidate: () => queryClient.invalidateQueries('/api/users/me'),
   };
 

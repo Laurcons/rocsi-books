@@ -1,11 +1,13 @@
 import useUser from "@/lib/useUser";
 import Link from "next/link";
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { Container, Nav, Navbar, Spinner } from "react-bootstrap";
 
 function NextLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return <Link href={href} passHref legacyBehavior>
-    <Nav.Link>{ children }</Nav.Link>
-  </Link>
+  return <li className="nav-item">
+    <Link href={href} className="nav-link">
+      { children }
+    </Link>
+  </li>;
 }
 
 export default function AppNavbar() {
@@ -23,6 +25,7 @@ export default function AppNavbar() {
             </> }
           </Nav>
           <Nav>
+            { session.isFetching && <Spinner size="sm" variant="light" className="me-3 mt-2" />}
             { session.isLoading ? <></> : <>
               { session.user ? <>
                 <div className="me-3 d-flex align-items-center text-light">
