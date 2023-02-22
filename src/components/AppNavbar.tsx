@@ -1,3 +1,4 @@
+import { queryClient } from "@/lib/queryClient";
 import useUser from "@/lib/useUser";
 import Link from "next/link";
 import { Container, Nav, Navbar, Spinner } from "react-bootstrap";
@@ -25,7 +26,7 @@ export default function AppNavbar() {
             </> }
           </Nav>
           <Nav>
-            { session.isFetching && <Spinner size="sm" variant="light" className="me-3 mt-2" />}
+            { !!queryClient.isFetching() && <Spinner size="sm" variant="light" className="me-3 mt-2" />}
             { session.isLoading ? <></> : <>
               { session.user ? <>
                 <div className="me-3 d-flex align-items-center text-light">
