@@ -16,3 +16,20 @@ model User {
   password String
   name     String
 }
+
+enum BookObtainMode {
+  BOUGHT
+  RECEIVED
+}
+
+model Book {
+  id             String     @id @map("_id") @default(auto()) @db.ObjectId
+  title          String
+  author         String
+  obtainDate     DateTime
+  obtainMode     BookObtainMode
+  receivedFrom   String
+  rating         Float?
+  notes          String
+  tags           String[]
+}

@@ -20,7 +20,7 @@ export default function Logout() {
       }
     }
     effect();
-  }, [session.isAuthed]);
+  }, [session.isAuthed, router]);
 
   return <Layout>
     { error ? error : "..." }

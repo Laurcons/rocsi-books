@@ -22,7 +22,7 @@ export default function useUser({
       if (query.data && redirectIfAuthenticated)
         router.push('/');
     }
-  }, [query.isLoading, query.data, redirectIfUnauthenticated, redirectIfAuthenticated]);
+  }, [query.isLoading, query.data, router, redirectIfUnauthenticated, redirectIfAuthenticated]);
 
 
   return {

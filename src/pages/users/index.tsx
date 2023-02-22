@@ -1,12 +1,12 @@
 import Layout from "@/components/Layout";
 import { fetcher } from "@/lib/fetcher";
 import { ApiPaginatedResponse } from "@/types";
-import { Prisma } from "@prisma/client";
+import { User } from "@prisma/client";
 import { useRouter } from "next/router";
 import { Alert, Spinner, Table } from "react-bootstrap";
 import { useQuery } from "react-query";
 
-async function fetchUsers(): Promise<ApiPaginatedResponse<Prisma.UserSelect[]>> {
+async function fetchUsers(): Promise<ApiPaginatedResponse<User[]>> {
   return (await fetcher('/api/users/getAll'))!;
 }
 
