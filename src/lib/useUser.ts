@@ -17,9 +17,9 @@ export default function useUser({
 
   useEffect(() => {
     if (!query.isLoading) {
-      if (!query.isSuccess && redirectIfUnauthenticated)
+      if (!query.data && redirectIfUnauthenticated)
         router.push(`/auth/login?redirect=${encodeURIComponent(router.asPath)}`);
-      if (query.isSuccess && redirectIfAuthenticated)
+      if (query.data && redirectIfAuthenticated)
         router.push('/');
     }
   }, [query.isLoading, query.data, redirectIfUnauthenticated, redirectIfAuthenticated]);
@@ -29,9 +29,8 @@ export default function useUser({
     user: query.data,
     isLoading: query.isLoading,
     error: query.error,
-    isError: query.isError,
     isFetching: query.isFetching,
-    isAuthed: query.isSuccess && !query.isLoading,
+    isAuthed: query.data && !query.isLoading,
     invalidate: () => queryClient.invalidateQueries('/api/users/me'),
   };
 
