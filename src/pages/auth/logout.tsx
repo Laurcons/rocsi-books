@@ -1,8 +1,8 @@
-import Layout from "@/components/Layout";
-import { fetchPost } from "@/lib/fetcher";
-import useUser from "@/lib/useUser";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import Layout from '@/components/Layout';
+import { fetchPost } from '@/lib/fetcher';
+import useUser from '@/lib/useUser';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 export default function Logout() {
   const [error, setError] = useState('');
@@ -23,6 +23,6 @@ export default function Logout() {
   }, [session.isAuthed, router]);
 
   return <Layout>
-    { error ? error : "..." }
+    { error ? error : '...' }
   </Layout>;
 }

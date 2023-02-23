@@ -26,10 +26,11 @@ model Book {
   id             String     @id @map("_id") @default(auto()) @db.ObjectId
   title          String
   author         String
-  obtainDate     DateTime
-  obtainMode     BookObtainMode
-  receivedFrom   String
+  obtainDate     DateTime?
+  obtainMode     BookObtainMode?
+  receivedFrom   String?
   rating         Float?
-  notes          String
+  publisher      String?
+  notes          String?
   tags           String[]
 }
