@@ -1,65 +1,87 @@
 import { prisma } from '@/lib/prisma';
-import { termToRegex } from '@/lib/search/termToRegex';
+import { termToRegexStage } from '@/lib/search/termToRegexStage';
 import { Book, BookObtainMode } from '@prisma/client';
 import { plainToClass, Transform } from 'class-transformer';
-import { IsEnum, IsNumber, IsNumberString, isNumberString, IsOptional, IsString, validateOrReject } from 'class-validator';
+import { IsArray, IsEnum, IsNumber, IsNumberString, isNumberString, IsOptional, IsString, validateOrReject } from 'class-validator';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 class QueryParams implements Partial<Book> {
   @IsOptional()
   @IsNumber()
   @Transform(o => parseInt(o.value))
-    skip: number;
+  skip: number;
 
   @IsOptional()
   @IsNumber()
   @Transform(o => parseInt(o.value))
-    take: number;
+  take: number;
 
   @IsOptional()
   @IsString()
-    title: string;
+  title: string;
 
   @IsOptional()
   @IsString()
-    author: string;
+  author: string;
 
   @IsOptional()
   @IsEnum(Object.values(BookObtainMode))
-    obtainMode: BookObtainMode;
+  obtainMode: BookObtainMode;
 
   @IsOptional()
   @IsString()
-    receivedFrom: string;
+  receivedFrom: string;
 
   @IsOptional()
   @IsString()
-    notes: string;
+  notes: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @Transform(o => o.value?.split(','))
+  tags: string[];
 }
 
 export default async function get(req: NextApiRequest, res: NextApiResponse) {
   const query = plainToClass(QueryParams, req.query);
   await validateOrReject(query);
-  const { skip, take, author, notes, obtainMode, receivedFrom, title } = query;
+  const { skip, take, author, notes, obtainMode, receivedFrom, title, tags } = query;
+
+  const pipeline = [
+    {
+      $match: {
+        ...(title && { title: termToRegexStage(title) }),
+        ...(author && { author: termToRegexStage(author) }),
+        ...(notes && { notes: termToRegexStage(notes) }),
+        ...(receivedFrom && { receivedFrom: termToRegexStage(receivedFrom) }),
+        ...(obtainMode && { obtainMode }),
+        ...(tags && {
+          $expr: {
+            $setIsSubset: [tags, '$tags']
+          }
+        })
+      }
+    },
+    ...(skip ? [{
+      $skip: skip
+    }] : []),
+    ...(take ? [{
+      $limit: take
+    }] : []),
+    {
+      // projection for Prisma
+      $addFields: {
+        id: { $toString: '$_id' }
+      }
+    }
+  ];
+
+  console.log(JSON.stringify({ pipeline }, null, 2));
 
   const books = await prisma.book.aggregateRaw({
-    pipeline: [
-      {
-        $match: {
-          ...(title && { author: termToRegex(title) }),
-        }
-      } as any
-    ]
+    pipeline
   });
-  //   skip, take,
-  //   where: {
-  //     ...(author && { author: { equals: author, mode: 'insensitive' } }),
-  //     ...(notes && { notes: { contains: notes, mode: 'insensitive' } }),
-  //     ...(receivedFrom && { receivedFrom: { contains: receivedFrom, mode: 'insensitive' } }),
-  //     ...(title && { title: { contains: title, mode: 'insensitive' } }),
-  //     ...(obtainMode && { obtainMode }),
-  //   }
-  // });
 
   res.json(books);
 }
