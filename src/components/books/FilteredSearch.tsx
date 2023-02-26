@@ -31,7 +31,7 @@ const filters: FilterConfig[] = [
   },
   {
     name: 'obtainMode',
-    humanized: 'Data obținerii',
+    humanized: 'Modul obținerii',
     type: 'enum',
     values: [
       [BookObtainMode.BOUGHT, 'Cumpărată'],
